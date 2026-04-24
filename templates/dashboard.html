@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}— 대시보드{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-title">관리자 대시보드</div>
+  <div class="hint">
+    IDOR 테스트: <code>/api/users/&lt;id&gt;</code>, <code>/api/orders/&lt;id&gt;</code> — 권한 검증 없음
+  </div>
+
+  <div style="margin-bottom:20px;">
+    <div style="font-size:11px;color:var(--muted);margin-bottom:8px;">사용자 목록 (IDOR 취약)</div>
+    <table>
+      <tr><th>ID</th><th>사용자명</th><th>이메일</th><th>권한</th><th>API</th></tr>
+      {% for u in users %}
+      <tr>
+        <td>{{ u[0] }}</td>
+        <td>{{ u[1] }}</td>
+        <td>{{ u[2] }}</td>
+        <td style="color:{% if u[3]=='admin' %}var(--accent){% else %}var(--muted){% endif %}">{{ u[3] }}</td>
+        <td><a href="/api/users/{{ u[0] }}" style="color:var(--accent2);">/api/users/{{ u[0] }}</a></td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+
+  <div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:8px;">상품 목록</div>
+    <table>
+      <tr><th>ID</th><th>상품명</th><th>가격</th></tr>
+      {% for p in products %}
+      <tr>
+        <td>{{ p[0] }}</td>
+        <td>{{ p[1] }}</td>
+        <td>₩{{ "{:,}".format(p[2]) }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title">취약 엔드포인트 빠른 접근</div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;font-size:12px;">
+    <a href="/api/users/1" class="btn btn-sec" style="text-align:center;">GET /api/users/1</a>
+    <a href="/api/users/2" class="btn btn-sec" style="text-align:center;">GET /api/users/2</a>
+    <a href="/api/orders/1" class="btn btn-sec" style="text-align:center;">GET /api/orders/1</a>
+    <a href="/debug" class="btn btn-sec" style="text-align:center;">GET /debug</a>
+    <a href="/api/config" class="btn btn-sec" style="text-align:center;">GET /api/config</a>
+    <a href="/redirect?next=https://google.com" class="btn btn-sec" style="text-align:center;">Open Redirect</a>
+    <a href="/greet?name={{7*7}}" class="btn btn-sec" style="text-align:center;">SSTI {{"{{"}}7*7{{"}}"}}</a>
+    <a href="/file?name=../app.py" class="btn btn-sec" style="text-align:center;">Path Traversal</a>
+    <a href="/change-password" class="btn" style="text-align:center;">CSRF 테스트</a>
+  </div>
+</div>
+{% endblock %}

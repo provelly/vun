@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}— Ping (Command Injection){% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-title">Ping 도구 <span class="vuln-badge">OS Command Injection</span></div>
+  <div class="hint">
+    취약 코드: <code>subprocess.check_output(f"ping -c 3 {host}", shell=True)</code><br><br>
+    테스트 페이로드:<br>
+    • <code>127.0.0.1; id</code><br>
+    • <code>127.0.0.1 && whoami</code><br>
+    • <code>127.0.0.1 | cat /etc/passwd</code><br>
+    • <code>127.0.0.1; ls -la /var/www</code><br>
+    • <code>127.0.0.1; cat /proc/version</code>
+  </div>
+
+  <form method="POST">
+    <div class="form-group">
+      <label>호스트명 또는 IP</label>
+      <input type="text" name="host" value="{{ host }}" placeholder="127.0.0.1 또는 127.0.0.1; id">
+    </div>
+    <button type="submit" class="btn">실행</button>
+  </form>
+
+  {% if result %}
+  <div class="output">{{ result }}</div>
+  {% endif %}
+</div>
+{% endblock %}

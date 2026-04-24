@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}— SSRF{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-title">URL Fetch <span class="vuln-badge">SSRF</span></div>
+  <div class="hint">
+    취약 코드: <code>requests.get(url)</code> — 내부 URL 필터링 없음<br><br>
+    테스트 페이로드:<br>
+    • <code>http://169.254.169.254/latest/meta-data/</code> → AWS 메타데이터<br>
+    • <code>http://169.254.169.254/latest/meta-data/iam/security-credentials/</code> → IAM 자격증명<br>
+    • <code>http://localhost:5000/debug</code> → 내부 디버그 엔드포인트<br>
+    • <code>http://192.168.1.1/admin</code> → 내부 라우터 관리 페이지<br>
+    • <code>file:///etc/passwd</code> → 로컬 파일 읽기
+  </div>
+
+  <form method="POST">
+    <div class="form-group">
+      <label>URL (서버가 직접 요청)</label>
+      <input type="text" name="url" value="{{ url }}" placeholder="http://169.254.169.254/latest/meta-data/">
+    </div>
+    <button type="submit" class="btn">서버에서 요청</button>
+  </form>
+
+  {% if result %}
+  <div class="output">{{ result }}</div>
+  {% endif %}
+</div>
+{% endblock %}

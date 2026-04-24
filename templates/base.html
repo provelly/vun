@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>VulnFlask {% block title %}{% endblock %}</title>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#0d0d0f;--surface:#16161a;--surface2:#1e1e24;
+      --border:#2a2a35;--accent:#ff4444;--accent2:#ff7700;
+      --green:#00ff88;--text:#e8e8f0;--muted:#888899;
+      --font:'Courier New',monospace;
+    }
+    body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;}
+    .warn-banner{background:linear-gradient(90deg,#1a0000,#2a0a00,#1a0000);border-bottom:2px solid var(--accent);padding:8px 20px;text-align:center;font-size:11px;color:#ff8888;letter-spacing:1px;}
+    header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 30px;display:flex;align-items:center;justify-content:space-between;height:56px;}
+    .logo{font-size:20px;font-weight:bold;color:var(--accent);letter-spacing:2px;text-decoration:none;}
+    .logo span{color:var(--accent2);}
+    nav a{color:var(--muted);text-decoration:none;margin-left:18px;font-size:12px;transition:color .2s;}
+    nav a:hover{color:var(--text);}
+    .container{max-width:960px;margin:30px auto;padding:0 20px;}
+    .card{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:24px;margin-bottom:20px;}
+    .card-title{font-size:11px;letter-spacing:2px;color:var(--accent);text-transform:uppercase;margin-bottom:16px;}
+    .vuln-badge{display:inline-block;background:rgba(255,68,68,.15);border:1px solid rgba(255,68,68,.4);color:var(--accent);font-size:10px;padding:2px 8px;border-radius:2px;margin-left:8px;letter-spacing:1px;}
+    .form-group{margin-bottom:14px;}
+    label{font-size:11px;color:var(--muted);display:block;margin-bottom:5px;}
+    input[type=text],input[type=password],input[type=email],input[type=number],textarea,select{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);padding:9px 12px;font-family:var(--font);font-size:13px;border-radius:2px;outline:none;transition:border-color .2s;}
+    input:focus,textarea:focus{border-color:var(--accent);}
+    textarea{resize:vertical;min-height:100px;}
+    .btn{display:inline-block;background:var(--accent);color:#fff;border:none;padding:9px 20px;font-family:var(--font);font-size:12px;letter-spacing:1px;cursor:pointer;border-radius:2px;text-decoration:none;transition:background .2s;}
+    .btn:hover{background:#cc2222;}
+    .btn-sec{background:var(--surface2);border:1px solid var(--border);color:var(--text);}
+    .btn-sec:hover{border-color:var(--accent);color:var(--accent);background:var(--surface2);}
+    .output{background:#0a0a0c;border:1px solid var(--border);border-left:3px solid var(--accent);padding:14px;font-size:12px;line-height:1.8;white-space:pre-wrap;word-break:break-all;border-radius:2px;margin-top:14px;color:var(--green);}
+    .output.err{border-left-color:var(--accent2);color:var(--accent2);}
+    .hint{font-size:11px;color:var(--muted);border-left:2px solid var(--border);padding-left:10px;line-height:1.8;margin-bottom:16px;}
+    table{width:100%;border-collapse:collapse;font-size:12px;}
+    th{background:var(--surface2);color:var(--muted);padding:8px 12px;text-align:left;font-size:10px;letter-spacing:1px;border-bottom:1px solid var(--border);}
+    td{padding:8px 12px;border-bottom:1px solid var(--border);}
+    tr:hover td{background:rgba(255,68,68,.04);}
+    .alert{padding:10px 14px;border-radius:2px;margin-bottom:14px;font-size:12px;}
+    .alert-ok{background:rgba(0,255,136,.1);border:1px solid rgba(0,255,136,.3);color:var(--green);}
+    .alert-err{background:rgba(255,68,68,.1);border:1px solid rgba(255,68,68,.3);color:var(--accent);}
+    ::-webkit-scrollbar{width:5px;}
+    ::-webkit-scrollbar-track{background:var(--bg);}
+    ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+  </style>
+</head>
+<body>
+<div class="warn-banner">⚠ 보안 교육/펜테스트 실습용 — 의도적 취약 앱 — FOR LAB USE ONLY ⚠</div>
+<header>
+  <a class="logo" href="/">VULN<span>FLASK</span></a>
+  <nav>
+    <a href="/">홈</a>
+    <a href="/products">상품(SQLi)</a>
+    <a href="/board">게시판(XSS)</a>
+    <a href="/upload">업로드</a>
+    <a href="/ping">Ping(CMD)</a>
+    <a href="/fetch">SSRF</a>
+    <a href="/xxe">XXE</a>
+    <a href="/greet?name=Guest">SSTI</a>
+    <a href="/file?name=readme.txt">Path</a>
+    <a href="/debug">Debug</a>
+    {% if session.user %}
+      <a href="/dashboard">대시보드</a>
+      <a href="/logout" style="color:var(--accent);">로그아웃({{ session.user }})</a>
+    {% else %}
+      <a href="/login">로그인</a>
+    {% endif %}
+  </nav>
+</header>
+<div class="container">
+  {% block content %}{% endblock %}
+</div>
+</body>
+</html>

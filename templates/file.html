@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}— 파일 읽기{% endblock %}
+{% block content %}
+<div class="card">
+  <div class="card-title">파일 읽기 <span class="vuln-badge">Path Traversal</span></div>
+  <div class="hint">
+    취약 코드: <code>open(os.path.join(base_dir, filename))</code> — 경로 정규화 없음<br><br>
+    테스트 페이로드:<br>
+    • <code>/file?name=../../../etc/passwd</code><br>
+    • <code>/file?name=../../../etc/hosts</code><br>
+    • <code>/file?name=../app.py</code> → 소스코드 노출<br>
+    • <code>/file?name=../vulnshop.db</code> → DB 파일 접근
+  </div>
+
+  <form method="GET">
+    <div class="form-group">
+      <label>파일명</label>
+      <input type="text" name="name" value="{{ filename }}" placeholder="../../../etc/passwd">
+    </div>
+    <button type="submit" class="btn">읽기</button>
+  </form>
+
+  {% if content %}
+  <div class="output">{{ content }}</div>
+  {% endif %}
+</div>
+{% endblock %}
